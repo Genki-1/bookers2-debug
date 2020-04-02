@@ -1,9 +1,36 @@
+<% if @newbook.errors.any? %>
+          <div id="error_explanation">
+            <h3><%= @newbook.errors.count %> error prohibited this obj from being saved:</h3>
+           
+              <ul>
+                  <% @newbook.errors.full_messages.each do |msg| %>
+                      <li><%= msg %></li>
+                  <% end %>
+              </ul>
+          </div>
+      <% end %>
 
 <div class="row">
 	<div class="col-xs-3">
 
 		<h2>User info</h2>
-		<%= render 'users/profile' %>
+		<table class="table">
+				<tr><%= attachment_image_tag @user, :profile_image, :fill, 100, 100, format: 'jpg', fallback: "no_image.jpg", size:'100x100' %></tr>
+
+				<tr>
+					<th>name</th>
+					<th><%= @user.name %></th>
+				</tr>
+
+				<tr>
+					<th>introduction</th>
+					<th><%= @user.introduction %></th>
+				</tr>
+		</table>
+
+		<div class="row">
+			<%= link_to '',edit_user_path(@user), class: "col-xs-12 btn btn-default glyphicon glyphicon-wrench edit_user_#{@user.id}" %>
+		</div>
 
 		<h2>New book</h2>
 		<%= render 'books/newform' %>

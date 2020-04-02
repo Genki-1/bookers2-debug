@@ -1,7 +1,14 @@
 class Book < ApplicationRecord
-	has_many :user
-	#バリデーションは該当するモデルに設定する。エラーにする条件を設定できる。
-	#presence trueは空欄の場合を意味する。
+
+	belongs_to :user
+
+	def books
+	  return Book.find_by(user_id: self.id)
+	end
+
 	validates :title, presence: true
-	validates :body, presence: true, length: {maximum: 200}
+
+	validates :body, 
+		presence: true, 
+		length: { maximum: 199 }
 end

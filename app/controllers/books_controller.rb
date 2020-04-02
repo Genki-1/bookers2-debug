@@ -1,48 +1,79 @@
 class BooksController < ApplicationController
 
-  def show
-  	@book = Book.find(params[:id])
-  end
+  before_action :ensure_correct_user, only: [:edit, :update, :destroy]
+
+  before_action :login_check, only: [:new, :edit, :update, :destroy, :index, :show, :create]
+
 
   def index
-  	@books = Book.all #一覧表示するためにBookモデルの情報を全てくださいのall
+    @books = Book.all
+    @book = Book.new
+    @newbook = Book.new
+  end
+
+  def show
+    @user = current_user
+    @newbook = Book.new
+    @book = Book.find(params[:id])
+  end
+
+  def new
   end
 
   def create
-  	@book = Book.new(book_params) #Bookモデルのテーブルを使用しているのでbookコントローラで保存する。
-  	if @book.save #入力されたデータをdbに保存する。
-  		redirect_to @book, notice: "successfully created book!"#保存された場合の移動先を指定。
-  	else
-  		@books = Book.all
-  		render 'index'
-  	end
+    @book = Book.new(book_params)
+    @book.user_id = current_user.id
+    if @book.save
+      redirect_to book_path(@book.id)
+      flash[:notice] = "You have creatad book successfully."
+    else
+      @books = Book.all
+      render("/books/index")
+    end
   end
 
   def edit
-  	@book = Book.find(params[:id])
+    @book = Book.find(params[:id])
   end
-
-
 
   def update
-  	@book = Book.find(params[:id])
-  	if @book.update(book_params)
-  		redirect_to @book, notice: "successfully updated book!"
-  	else #if文でエラー発生時と正常時のリンク先を枝分かれにしている。
-  		render "edit"
-  	end
+    @book = Book.find(params[:id])
+     if @book.update(book_params)
+      redirect_to book_path(@book)
+      flash[:notice] = "You have updated book successfully."
+    else
+      render :edit
+    end
   end
 
-  def delete
-  	@book = Book.find(params[:id])
-  	@book.destoy
-  	redirect_to books_path, notice: "successfully delete book!"
+  def destroy
+    book = Book.find(params[:id])
+    book.destroy
+    redirect_to books_path
   end
+
+  def ensure_correct_user
+      @book = Book.find(params[:id])
+      if user_signed_in?
+        if @book.user_id != current_user.id
+          redirect_to books_path
+        end
+      else
+        redirect_to ("/users/sign_in")
+      end
+  end
+
 
   private
-
   def book_params
-  	params.require(:book).permit(:title)
+    params.require(:book).permit(:title, :body)
+  end
+
+
+  def login_check
+    unless user_signed_in?
+      redirect_to ("/users/sign_in")
+    end
   end
 
 end

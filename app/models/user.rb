@@ -2,11 +2,24 @@ class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :trackable,:validatable
+         :recoverable, :rememberable, :validatable
 
-  belongs_to :books
-  attachment :profile_image, destroy: false
+  has_many :books, dependent: :destroy
 
-  #バリデーションは該当するモデルに設定する。エラーにする条件を設定できる。
-  validates :name, length: {maximum: 20, minimum: 2}
+  def books
+	  return Book.where(user_id: self.id)
+  end
+
+  attachment :profile_image
+
+  validates :name, 
+    presence: true,
+    length: { minimum: 2, maximum: 20 }
+
+  validates :email, 
+    uniqueness: true,
+    presence: true
+
+  validates :introduction, 
+  	length: { maximum: 50 }
 end
