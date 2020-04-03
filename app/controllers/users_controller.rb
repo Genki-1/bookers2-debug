@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
-	before_action :ensure_correct_user, only: [:edit, :update]
+
+  before_action :ensure_correct_user, only: [:edit, :update]
 
   before_action :login_check, only: [:new, :edit, :update, :destroy, :index, :show, :create]
 
@@ -43,13 +44,6 @@ class UsersController < ApplicationController
 
     private
 
-    #url直接防止　メソッドを自己定義してbefore_actionで発動。
-   def baria_user
-    unless params[:id].to_i == current_user.id
-      redirect_to user_path(current_user)
-    end
-   end
-
 
   def user_params
     params.require(:user).permit(:name, :introduction, :profile_image)
@@ -60,7 +54,5 @@ class UsersController < ApplicationController
         redirect_to ("/users/sign_in")
       end
   end
-
-
 
 end
